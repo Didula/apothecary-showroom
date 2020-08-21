@@ -5,6 +5,7 @@
                 color="primary"
                 dark>
             <div class="d-flex align-center">
+                <h1>Apothecary Store</h1>
             </div>
 
             <v-spacer></v-spacer>
@@ -33,9 +34,6 @@
         components: {},
         data: () => ({
 
-        }),
-        mounted() {
-            this.$store.dispatch('fetchProducts')
-        }
+        })
     };
 </script>
