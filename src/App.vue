@@ -29,11 +29,23 @@
 <script>
 
 
+    import axiosInstance from "./axios-config";
+
     export default {
         name: 'App',
         components: {},
-        data: () => ({
-
-        })
+        methods: {
+            fetchProducts() {
+                axiosInstance.get('/products')
+                    .then(response => {
+                        console.log('fetched products');
+                        let products = (response.data);
+                        this.$store.commit('storeProducts', products);
+                    });
+            }
+        },
+        beforeMount() {
+            this.fetchProducts()
+        }
     };
 </script>

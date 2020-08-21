@@ -43,6 +43,7 @@
                     .then(response => {
                         console.log('fetched products');
                         this.products = (response.data);
+                        this.$store.commit('storeProducts', this.products);
                     })
                     .then(() => {
                         this.fetchProductTables();

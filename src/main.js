@@ -10,9 +10,9 @@ Vue.filter('toCurrency', function (value) {
   if (typeof value !== "number") {
     return value;
   }
-  let formatter = new Intl.NumberFormat('en-US', {
+  let formatter = new Intl.NumberFormat('en-IN', {
     style: 'currency',
-    currency: 'USD',
+    currency: 'LKR',
     minimumFractionDigits: 2
   });
   return formatter.format(value);

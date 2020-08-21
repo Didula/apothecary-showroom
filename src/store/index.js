@@ -6,9 +6,7 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    products: {
-      productList: ''
-    },
+    products: '',
     isSpinnerShow: false
   },
   mutations: {
