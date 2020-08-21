@@ -3,13 +3,18 @@
         <v-card class="ma-lg-6 pa-lg-4">
             <v-list-item-content>
                 <v-list-item-title class="headline mb-1">{{product.name}}</v-list-item-title>
+                <v-list-item-subtitle>Carton price : {{product.cartonPrice | toCurrency}}</v-list-item-subtitle>
+                <p>Buy {{product.discountThreshold}} or more cartons to apply {{(product.cartonSaleDiscount)*100}}%
+                    discount</p>
             </v-list-item-content>
 
             <v-list-item-avatar
                     tile
                     size="80"
-                    color="grey"
-            ></v-list-item-avatar>
+                    color="grey">
+                <img :src="getImageSource(product.code)"
+                     :alt="product.name">
+            </v-list-item-avatar>
             <v-card-actions>
                 <v-col
                         cols="12"
@@ -19,7 +24,7 @@
                             type="number"
                             :error-messages="amountErrors"
                             placeholder="Enter amount"
-                            v-on:blur="inquirePrice"
+                            v-on:change="inquirePrice"
                             @input="$v.amount.$touch()"
                             @blur="$v.amount.$touch()"
                     >
@@ -35,13 +40,13 @@
 
 <script>
     import {validationMixin} from 'vuelidate';
-    import {required, minValue} from 'vuelidate/lib/validators'
+    import {minValue, required} from 'vuelidate/lib/validators'
     import axiosInstance from "../axios-config";
 
     export default {
         name: "ProductListing",
-        validations:{
-          amount: {required, minValue : minValue(1)}
+        validations: {
+            amount: {required, minValue: minValue(1)}
         },
         mixins: [validationMixin],
         data: () => ({
@@ -54,6 +59,9 @@
         }),
         props: ['product'],
         methods: {
+            getImageSource(fileName) {
+                return require('../assets/' + fileName + '.jpg');
+            },
             inquirePrice() {
                 if (this.amount && this.amount > 0) {
                     axiosInstance.get('/products/' + this.product.code + '/price', {
@@ -73,7 +81,7 @@
             }
         },
         computed: {
-            amountErrors(){
+            amountErrors() {
                 const errors = []
                 if (!this.$v.amount.$dirty) return errors
                 !this.$v.amount.minValue && errors.push('Amount must be positive')
