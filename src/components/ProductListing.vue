@@ -1,5 +1,6 @@
 <template>
-    <v-card class="ma-lg-6 pa-lg-4">
+    <form>
+        <v-card class="ma-lg-6 pa-lg-4">
             <v-list-item-content>
                 <v-list-item-title class="headline mb-1">{{product.name}}</v-list-item-title>
             </v-list-item-content>
@@ -16,32 +17,45 @@
                     <v-text-field
                             v-model="amount"
                             type="number"
-                            min="0"
+                            :error-messages="amountErrors"
                             placeholder="Enter amount"
                             v-on:blur="inquirePrice"
-                            >
+                            @input="$v.amount.$touch()"
+                            @blur="$v.amount.$touch()"
+                    >
                     </v-text-field>
                 </v-col>
 
-                <span></span><h2>{{price | toCurrency}}</h2>
+                <span></span>
+                <h2>{{price | toCurrency}}</h2>
             </v-card-actions>
-    </v-card>
+        </v-card>
+    </form>
 </template>
 
 <script>
+    import {validationMixin} from 'vuelidate';
+    import {required, minValue} from 'vuelidate/lib/validators'
     import axiosInstance from "../axios-config";
+
     export default {
         name: "ProductListing",
-        data: () => {
-          return {
-              amount: 0,
-              price: 0
-          }
+        validations:{
+          amount: {required, minValue : minValue(1)}
         },
+        mixins: [validationMixin],
+        data: () => ({
+            amount: 0,
+            price: 0,
+            amountRules: [
+                v => !!v || 'Amount is required',
+                v => (v && v > 0) || 'Amount must be a positive number',
+            ]
+        }),
         props: ['product'],
         methods: {
-            inquirePrice(){
-                if(this.amount > 0){
+            inquirePrice() {
+                if (this.amount && this.amount > 0) {
                     axiosInstance.get('/products/' + this.product.code + '/price', {
                         params: {
                             units: this.amount
@@ -53,7 +67,18 @@
                         .catch(error => {
                             console.log(error);
                         })
+                } else {
+                    this.price = 0;
                 }
+            }
+        },
+        computed: {
+            amountErrors(){
+                const errors = []
+                if (!this.$v.amount.$dirty) return errors
+                !this.$v.amount.minValue && errors.push('Amount must be positive')
+                !this.$v.amount.required && errors.push('Amount is required.')
+                return errors
             }
         }
     }
